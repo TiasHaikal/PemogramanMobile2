@@ -28,7 +28,7 @@ class LoginView extends GetView<LoginController> {
             TextField(
               controller: controller.cEmail,
               decoration: InputDecoration(
-                labelText: "Email/Username",
+                labelText: "Email",
               ),
             ),
             TextField(
@@ -43,10 +43,7 @@ class LoginView extends GetView<LoginController> {
             ),
             ElevatedButton(
               onPressed: () {
-                cAuth.login(
-                  controller.cEmail.text,
-                  controller.cPass.text,
-                );
+                cAuth.login(controller.cEmail.text, controller.cPass.text);
               },
               child: Text("Login"),
               style: ElevatedButton.styleFrom(
@@ -75,11 +72,24 @@ class LoginView extends GetView<LoginController> {
                 Text("Belum Punya Akun ?"),
                 TextButton(
                   onPressed: () {
-                    Get.toNamed(Routes.SIGNUP);
+                    Get.offAllNamed(Routes.SIGNUP);
                   },
                   child: Text("Daftar Disini"),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                cAuth.LoginGoogle();
+              },
+              child: Text("Login With Google"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 105, 150, 34),
+                foregroundColor: Colors.white,
+              ),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:myapp/app/routes/app_pages.dart';
 
 class AuthController extends GetxController {
@@ -34,22 +35,22 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> login(String email, String pass) async {
+  void login(String email, String pass) async {
     try {
       final credential = await auth.signInWithEmailAndPassword(
         email: email,
         password: pass,
       );
-      if (!credential.user!.emailVerified) {
+
+      if (credential.user!.emailVerified) {
         Get.offAllNamed(Routes.HOME);
-        return;
       } else {
         Get.defaultDialog(
-          title: "Proses Gagal",
-          middleText: "Harap verivikasi Email terlebih dahulu.",
+          title: "Proses Gagal !",
+          middleText: "Harap Verifikasi Email terlebih dahulu.",
           textConfirm: "OK",
           onConfirm: () {
-            Get.back();
+            Get.back(); //close dialog
           },
         );
       }
@@ -75,7 +76,7 @@ class AuthController extends GetxController {
     Get.offAllNamed(Routes.LOGIN);
   }
 
- void resetPassword(String email) async {
+  void resetPassword(String email) async {
     if (email != "" && GetUtils.isEmail(email)) {
       try {
         await auth.sendPasswordResetEmail(email: email);
@@ -96,6 +97,34 @@ class AuthController extends GetxController {
     } else {
       Get.defaultDialog(
           title: "Terjadi kesalahan", middleText: "Email tidak valid");
+    }
+  }
+
+  void LoginGoogle() async {
+    try {
+      GoogleSignIn _googleSignIn = GoogleSignIn();
+      GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser != null) {
+        final GoogleSignInAuthentication? googleAuth =
+            await googleUser?.authentication;
+
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth?.accessToken,
+          idToken: googleAuth?.idToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        Get.offAllNamed(Routes.HOME);
+        print(googleUser);
+      } else {
+        throw "Belum Memilih Akun Google";
+      }
+    } catch (error) {
+      print(error);
+      Get.defaultDialog(
+        title: "Terjadi Kesalahan",
+        middleText: "${error.toString()}",
+      );
     }
   }
 }
